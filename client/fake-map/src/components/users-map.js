@@ -8,6 +8,23 @@ class UsersMap extends Component {
 
     componentDidMount() {
         let markers = []
+        let container = document.getElementById('popup');
+        let content = document.getElementById('popup-content');
+        let closer = document.getElementById('popup-closer');
+
+        const overlay = new window.ol.Overlay({
+            element: container,
+            autoPan: true,
+            autoPanAnimation: {
+                duration: 250
+            }
+        });
+
+        closer.onclick = () => {
+            overlay.setPosition(undefined);
+            closer.blur();
+            return false;
+        };
 
         const baseMapLayer = new window.ol.layer.Tile({
             source: new window.ol.source.OSM()
@@ -16,6 +33,7 @@ class UsersMap extends Component {
         const map = new window.ol.Map({
             target: 'map',
             layers: [ baseMapLayer],
+            overlays: [overlay],
             view: new window.ol.View({
                 center: window.ol.proj.fromLonLat([-89.935242, 45.730610]),
                 zoom: 4
@@ -37,6 +55,7 @@ class UsersMap extends Component {
                     src: 'img/dot.png'
                 }))
             }));
+
             markers.push(marker)
         })
 
@@ -49,10 +68,25 @@ class UsersMap extends Component {
         });
 
         map.addLayer(markerVectorLayer);
+
+        map.on('singleclick', (evt) => {
+            var coordinate = evt.coordinate;
+
+            content.innerText = 'You clicked here'
+            overlay.setPosition(coordinate);
+        });
     }
 
     render() {
-        return  <div id="map" />
+        return (
+            <div>
+                <div id="map" />
+                <div id="popup" className="ol-popup">
+                    <a href="#" id="popup-closer" className="ol-popup-closer"/>
+                    <div id="popup-content" />
+                </div>
+            </div>
+        )
     }
 }
 

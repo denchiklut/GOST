@@ -18,6 +18,7 @@ class App extends Component {
 
   render() {
     const { users } = this.state
+    if (users.length === 0) return false
 
     return (
         <Row

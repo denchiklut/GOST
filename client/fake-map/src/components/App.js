@@ -4,6 +4,7 @@ import axios from 'axios';
 import Row from "./row";
 import SideBar from "./side-bar";
 import UsersMap from "./users-map";
+import './style.scss'
 
 
 class App extends Component {

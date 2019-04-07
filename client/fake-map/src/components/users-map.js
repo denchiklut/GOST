@@ -2,17 +2,19 @@ import React, {Component} from 'react';
 
 class UsersMap extends Component {
 
+    map
+    content
+    userImg
+    overlay
+
     shouldComponentUpdate(nextProps, nextState, nextContext) {
         return false
     }
 
-    map
-    content
-    overlay
-
     updateCoordinate = (user) => {
         var coord = window.ol.proj.fromLonLat([user.geometry.coordinates[0], user.geometry.coordinates[1]])
 
+        this.userImg.setAttribute("src", user.properties.avatar)
         this.content.innerText =  user.properties.userName +': '+ user.properties.email;
         this.overlay.setPosition(coord);
 
@@ -24,6 +26,7 @@ class UsersMap extends Component {
         let markers = []
         let container = document.getElementById('popup');
         this.content = document.getElementById('popup-content');
+        this.userImg = document.getElementById('popImg');
         let closer = document.getElementById('popup-closer');
 
        this.overlay = new window.ol.Overlay({
@@ -62,6 +65,7 @@ class UsersMap extends Component {
                 ),
                 userName: user.properties.userName,
                 userEmail: user.properties.email,
+                userAvatar: user.properties.avatar,
             });
 
             marker.setStyle(new window.ol.style.Style({
@@ -91,6 +95,7 @@ class UsersMap extends Component {
                 let userData = feature.getProperties();
                 let coord = userData.geometry.flatCoordinates;
 
+                this.userImg.setAttribute("src", userData.userAvatar)
                 this.content.innerText =  userData.userName +': '+ userData.userEmail;
                 this.overlay.setPosition(coord);
             })
@@ -106,6 +111,7 @@ class UsersMap extends Component {
             <div>
                 <div id="map" />
                 <div id="popup" className="ol-popup">
+                    <img src="https://s3.amazonaws.com/uifaces/faces/twitter/larrybolt/128.jpg" alt="user" id="popImg"/>
                     <a href="#" id="popup-closer" className="ol-popup-closer"/>
                     <div id="popup-content" />
                 </div>

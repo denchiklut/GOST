@@ -46,6 +46,8 @@ class UsersMap extends Component {
                 geometry: new window.ol.geom.Point(
                     window.ol.proj.fromLonLat([user.geometry.coordinates[0], user.geometry.coordinates[1]])
                 ),
+                userName: user.properties.userName,
+                userEmail: user.properties.email,
             });
 
             marker.setStyle(new window.ol.style.Style({
@@ -69,11 +71,15 @@ class UsersMap extends Component {
 
         map.addLayer(markerVectorLayer);
 
-        map.on('singleclick', (evt) => {
-            var coordinate = evt.coordinate;
+        map.on("click", function(evt) {
+            map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
 
-            content.innerText = 'You clicked here'
-            overlay.setPosition(coordinate);
+                let coord = map.getCoordinateFromPixel(evt.pixel);
+                let userData = feature.getProperties();
+
+                content.innerText =  userData.userName +': '+ userData.userEmail;
+                overlay.setPosition(coord);
+            })
         });
     }
 

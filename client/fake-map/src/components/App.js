@@ -8,12 +8,18 @@ import UsersMap from "./users-map";
 
 class App extends Component {
   state = {
-    users: []
+    users: [],
+    user: null
   }
+
   componentDidMount() {
     axios
         .get('http://localhost:3000/features')
         .then(res => this.setState({users: res.data.features}))
+  }
+
+  selectUser = user => {
+    this.setState({user})
   }
 
   render() {
@@ -22,8 +28,8 @@ class App extends Component {
 
     return (
         <Row
-            left={<SideBar data={users}/>}
-            right={<UsersMap data={users}/>}
+            left={<SideBar data={users} onSelectUser={this.selectUser}/>}
+            right={<UsersMap data={users} zoom={this.state.user}/>}
         />
     );
   }

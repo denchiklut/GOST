@@ -6,13 +6,27 @@ class UsersMap extends Component {
         return false
     }
 
+    map
+    content
+    overlay
+
+    updateCoordinate = (user) => {
+        var coord = window.ol.proj.fromLonLat([user.geometry.coordinates[0], user.geometry.coordinates[1]])
+
+        this.content.innerText =  user.properties.userName +': '+ user.properties.email;
+        this.overlay.setPosition(coord);
+
+        this.map.getView().setZoom(5);
+        this.map.getView().setCenter(window.ol.proj.fromLonLat([...coord], 'EPSG:4326', 'EPSG:3857'))
+    }
+
     componentDidMount() {
         let markers = []
         let container = document.getElementById('popup');
-        let content = document.getElementById('popup-content');
+        this.content = document.getElementById('popup-content');
         let closer = document.getElementById('popup-closer');
 
-        const overlay = new window.ol.Overlay({
+       this.overlay = new window.ol.Overlay({
             element: container,
             autoPan: true,
             autoPanAnimation: {
@@ -21,7 +35,7 @@ class UsersMap extends Component {
         });
 
         closer.onclick = () => {
-            overlay.setPosition(undefined);
+            this.overlay.setPosition(undefined);
             closer.blur();
             return false;
         };
@@ -30,10 +44,10 @@ class UsersMap extends Component {
             source: new window.ol.source.OSM()
         });
 
-        const map = new window.ol.Map({
+            this.map = new window.ol.Map({
             target: 'map',
             layers: [ baseMapLayer],
-            overlays: [overlay],
+            overlays: [this.overlay],
             view: new window.ol.View({
                 center: window.ol.proj.fromLonLat([-89.935242, 45.730610]),
                 zoom: 4
@@ -69,18 +83,22 @@ class UsersMap extends Component {
             source: vectorSource,
         });
 
-        map.addLayer(markerVectorLayer);
+        this.map.addLayer(markerVectorLayer);
 
-        map.on("click", function(evt) {
-            map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
+        this.map.on("click", (evt) => {
+            this.map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
 
-                let coord = map.getCoordinateFromPixel(evt.pixel);
                 let userData = feature.getProperties();
+                let coord = userData.geometry.flatCoordinates;
 
-                content.innerText =  userData.userName +': '+ userData.userEmail;
-                overlay.setPosition(coord);
+                this.content.innerText =  userData.userName +': '+ userData.userEmail;
+                this.overlay.setPosition(coord);
             })
         });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.updateCoordinate(nextProps.zoom)
     }
 
     render() {

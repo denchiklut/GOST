@@ -2,6 +2,10 @@ import React, {Component} from 'react';
 
 class SideBar extends Component {
 
+    click = (user) => {
+        this.props.onSelectUser(user)
+    }
+
     render() {
         const { data } = this.props
         return (
@@ -10,7 +14,7 @@ class SideBar extends Component {
                 style={{backgroundColor: '#eaeaea',boxShadow: '3px 0px 4px -4px #000000ba', height: '100vh', overflow: 'auto'}}
             >
                 {data.map(user => (
-                    <div className="item" key={user.properties.id} style={{padding: 8}}>
+                    <div className="item" key={user.properties.id} style={{padding: 8}} onClick={() => this.click(user) }>
                         <img className="ui avatar image" src={user.properties.avatar} />
                             <div className="content">
                                 <a className="header">{user.properties.userName}</a>

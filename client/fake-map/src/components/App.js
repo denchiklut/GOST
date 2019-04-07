@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+
+import { fetchUsers, selectUser } from "../actions";
 
 import Row from "./row";
 import SideBar from "./side-bar";
@@ -8,32 +11,35 @@ import './style.scss'
 
 
 class App extends Component {
-  state = {
-    users: [],
-    user: null
-  }
 
   componentDidMount() {
-    axios
-        .get('http://localhost:3000/features')
-        .then(res => this.setState({users: res.data.features}))
+    this.props.fetchUsers()
   }
 
   selectUser = user => {
-    this.setState({user})
+    this.props.selectUser(user)
   }
 
   render() {
-    const { users } = this.state
+    const { users, user } = this.props
     if (users.length === 0) return false
 
     return (
         <Row
             left={<SideBar data={users} onSelectUser={this.selectUser}/>}
-            right={<UsersMap data={users} zoom={this.state.user}/>}
+            right={<UsersMap data={users} zoom={user}/>}
         />
     );
   }
 }
 
-export default App;
+const mapDispatchToProps = dispatch => {
+    return bindActionCreators({ fetchUsers, selectUser }, dispatch)
+}
+
+const mapStateToProps = ({users, user}) => {
+    return { users, user }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
